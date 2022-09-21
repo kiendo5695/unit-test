@@ -22,8 +22,7 @@ class AtmService
         if ($this->isVipCustomer) {
             return 0;
         }
-        if (
-            $dateTime->isWeekend() ||
+        if ($dateTime->isWeekend() ||
             $this->isHoliday($dateTime) ||
             ($time >= '00:00:00' && $time <= '08:44:59') ||
             ($time >= '18:00:00' && $time <= '23:59:59')
