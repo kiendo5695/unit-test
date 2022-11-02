@@ -13,7 +13,6 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    needs: [phpcs, laravel-tests]
     steps:
 
       - name: Checkout source code
