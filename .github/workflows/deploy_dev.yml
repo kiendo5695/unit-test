@@ -4,6 +4,11 @@ on:
   push:
     branches:
       - develop
+  workflow_run:
+    workflows: [ "Laravel CI" ]
+    branches: [ develop ]
+    types:
+      - completed
 
 jobs:
   build:
