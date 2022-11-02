@@ -1,21 +1,42 @@
 name: Deploy Stg
 
+env:
+  EB_PACKAGE_S3_BUCKET_NAME : "zzz.flask-app"
+  EB_APPLICATION_NAME       : "MyFlask"
+  EB_ENVIRONMENT_NAME       : "MyFlask-env"
+  DEPLOY_PACKAGE_NAME       : "flask-app-${{ github.sha }}.zip"
+  AWS_REGION_NAME           : "us-west-2"
+
 on:
   push:
     branches:
       - staging
+  workflow_run:
+    workflows: [ "Laravel CI" ]
+    branches: [ staging ]
+    types:
+      - completed
 
 jobs:
-  deploy:
+  deployment:
     runs-on: ubuntu-latest
-    needs: [phpcs, laravel-tests]
     steps:
-      - name: Install SSH Key
-        uses: shimataro/ssh-key-action@v2
+      - name: Configure my AWS Credentils
+        uses: aws-actions/configure-aws-credentials@v1
         with:
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          known_hosts: unnecessary
-      - name: Adding Known Hosts
-        run: ssh-keyscan -H ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
-      - name: Deploy with rsync
-        run: rsync -avz ./dist/ ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/var/www/dist/
+          aws-access-key-id    : ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region           : ${{ env.AWS_REGION_NAME }}
+
+      - name: Create new ElasticBeanstalk Applicaiton Version
+        run : |
+          aws elasticbeanstalk create-application-version \
+          --application-name ${{ env.EB_APPLICATION_NAME }} \
+          --source-bundle S3Bucket="${{ env.EB_PACKAGE_S3_BUCKET_NAME }}",S3Key="${{ env.DEPLOY_PACKAGE_NAME }}" \
+          --version-label "Ver-${{ github.sha }}" \
+          --description "CommitSHA-${{ github.sha }}"
+      - name: Deploy our new Application Version
+        run : aws elasticbeanstalk update-environment --environment-name ${{ env.EB_ENVIRONMENT_NAME }} --version-label "Ver-${{ github.sha }}"
+
+      - name: Print nice message on completion of CD Pipeline
+        run : echo "CD Pipeline part finished successfully"
