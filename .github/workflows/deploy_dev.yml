@@ -31,3 +31,4 @@ jobs:
           region: us-east-1
           version_label: Ver-${{ github.sha }}
           deployment_package: deploy-${{ github.sha }}.zip
+          use_existing_version_if_available: true
