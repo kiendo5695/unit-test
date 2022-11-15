@@ -29,5 +29,5 @@ jobs:
           application_name: UnitTestApp
           environment_name: UnitTestAppEnv
           region: us-east-1
-          version_label: 12348
-          deployment_package: deploy.zip
+          version_label: Ver-${{ github.sha }}
+          deployment_package: deploy-${{ github.sha }}.zip
