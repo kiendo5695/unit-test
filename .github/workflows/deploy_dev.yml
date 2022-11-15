@@ -20,7 +20,7 @@ jobs:
 
       - name: Generate deployment package
         run: |
-          echo ${{ secrets.AWS_ACCESS_KEY_ID }} > .env
+          echo ${{ secrets.DEV_ENV_FILE }} > .env
           zip -r deploy-${{ github.sha }}.zip . -x '*.git*'
 
       - name: Deploy to EB
