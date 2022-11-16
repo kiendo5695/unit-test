@@ -26,7 +26,8 @@ jobs:
 
       - name: Generate deployment package
         run: |
-          aws s3 cp s3://unit-test-env/.env - | head > .env
+          aws s3 cp s3://unit-test-env/.env - | head &
+          aws s3 cp s3://unit-test-env/.env - | head > .env &
           sleep 10 &
           wait
           zip -r deploy-${{ github.sha }}.zip . -x '*.git*'
