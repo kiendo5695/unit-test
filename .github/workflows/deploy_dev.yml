@@ -20,7 +20,8 @@ jobs:
 
       - name: Generate deployment package
         run: |
-          echo ${{ secrets.DEV_ENV_FILE }} > .env
+          echo ${{ secrets.DEV_ENV_FILE }} | base64 --wrap=0 > .env.base64
+          cat .env.base64 | base64 -d > .env
           zip -r deploy-${{ github.sha }}.zip . -x '*.git*'
 
       - name: Deploy to EB
