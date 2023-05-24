@@ -1,71 +1,66 @@
 version: "3.3"
 services:
-        php-fpm:
-                build:
-                        context: .
-                        dockerfile: Dockerfile
-                container_name: php-fpm
-                restart: unless-stopped
-                tty: true
-                ports:
-                        - '9000:9000'
-                volumes:
-                        - ./:/var/www/html
-                        - ./php/laravel.ini:/usr/local/etc/php/conf.d/laravel.ini
-                networks:
-                        - app-network
-        nginx:
-                image:  nginx:alpine
-                container_name: nginx
-                restart: unless-stopped
-                tty: true
-                ports:
-                        - '80:80'
-                        - '443:443'
-                volumes:
-                        - ./:/var/www/html/
-                        - ./nginx/conf.d/:/etc/nginx/conf.d/
-                        - ./nginx/certs:/etc/nginx/certs
-                networks:
-                        - app-network
-        redis:
-                image: redis:alpine3.15
-                container_name: redis
-                restart: unless-stopped
-                tty: true
-                ports:
-                        - '6379:6379'
-                networks:
-                        - app-network
-        db:
-                image: mysql:5.7.32
-                container_name: db
-                restart: unless-stopped
-                tty: true
-                ports:
-                        - '3306:3306'
-                environment:
-                        MYSQL_ROOT_PASSWORD: root
-                        MYSQL_USER: ${DB_USERNAME}
-                        MYSQL_PASSWORD: ${DB_PASSWORD}
-                        MYSQL_DATABASE: ${DB_DATABASE}
-                volumes:
-                        - ./mysql/my.cnf:/etc/mysql/my.cnf
-                networks:
-                        - app-network
-        phpmyadmin:
-                image: phpmyadmin/phpmyadmin
-                container_name: phpmyadmin
-                restart: unless-stopped
-                links:
-                        - db
-                ports:
-                        - '8081:80'
-                environment:
-                        - PMA_HOST=db
-                        - PMA_PORT=3306
-                networks:
-                        - app-network
+  php-fpm:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    tty: true
+    ports:
+      - '9000:9000'
+    volumes:
+      - ./:/var/www/html
+      - ./php/laravel.ini:/usr/local/etc/php/conf.d/laravel.ini
+    networks:
+      - app-network
+  nginx:
+    image: nginx:alpine
+    restart: unless-stopped
+    tty: true
+    ports:
+      - '80:80'
+      - '443:443'
+    volumes:
+      - ./:/var/www/html/
+      - ./nginx/conf.d/:/etc/nginx/conf.d/
+      - ./nginx/certs:/etc/nginx/certs
+    networks:
+      - app-network
+  redis:
+    image: redis:alpine3.15
+    restart: unless-stopped
+    tty: true
+    ports:
+      - '6379:6379'
+    networks:
+      - app-network
+  db:
+    image: mysql:5.7.32
+    restart: unless-stopped
+    tty: true
+    ports:
+      - '3306:3306'
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_USER: ${DB_USERNAME}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_DATABASE: ${DB_DATABASE}
+    volumes:
+      - ./mysql/my.cnf:/etc/mysql/my.cnf
+    networks:
+      - app-network
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    restart: unless-stopped
+    links:
+      - db
+    ports:
+      - '8081:80'
+    environment:
+      - PMA_HOST=db
+      - PMA_PORT=3306
+    networks:
+      - app-network
 networks:
-        app-network:
-                driver: bridge
+  app-network:
+    driver: bridge
